@@ -9,6 +9,8 @@ import { connectToSocket } from "./controllers/socketManager.js";
 import cors from "cors";
 import userRoutes from "./routes/users.routes.js";
 
+import dotenv from "dotenv";
+
 
 const app = express();
 const server  = createServer(app);
@@ -21,12 +23,19 @@ app.use(express.urlencoded({limit: "40kb", extended: true}));
 
 app.use("/api/v1/users", userRoutes);
 
-const start = async () =>{
-    const connectionDB = await mongoose.connect("mongodb+srv://Apnavideocall:Apnavideocall@apnavideocall.quk304w.mongodb.net/?appName=Apnavideocall")
-    console.log(`MONGO Connected DB Host ${connectionDB.connection.host}`)
-    server.listen(app.get("port"), () =>{
-        console.log("LISTENING ON PORT 8000");
+dotenv.config();
+const start = async () => {
+  try {
+    const connectionDB = await mongoose.connect(process.env.MONGO_URI);
+
+    console.log(`MONGO Connected DB Host ${connectionDB.connection.host}`);
+
+    server.listen(app.get("port"), () => {
+      console.log(`LISTENING ON PORT ${app.get("port")}`);
     });
-}
+  } catch (error) {
+    console.error("Mongo Error:", error);
+  }
+};
 
 start();
